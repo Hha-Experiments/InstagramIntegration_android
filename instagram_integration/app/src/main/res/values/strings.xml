@@ -2,7 +2,10 @@
 <resources>
 
     <string name="app_name">instagram_integration</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_login">Login</string>
+    <string name="title_activity_photo">Photo</string>
+
+    <string name="pref_name">hha_instagram</string>
 
 </resources>
