@@ -10,7 +10,8 @@
 
     <Button
         android:layout_width="300dp"
-        android:layout_height="50dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="150dp"
         android:text="Log in to Instragram"
         android:id="@+id/btn_login"/>
 
