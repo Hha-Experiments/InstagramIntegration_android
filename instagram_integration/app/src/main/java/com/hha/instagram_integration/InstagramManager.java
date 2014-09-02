@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 
 import android.os.AsyncTask;
 import android.webkit.CookieManager;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -17,7 +16,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -139,7 +137,7 @@ class InstagramManager {
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
                     InputStream instream = entity.getContent();
-                    String result = convertStreamToString(instream);// method to convert stream to String
+                    String result = convertStreamToString(instream);
                     JSONObject object = new JSONObject(new JSONTokener(result));
 
                     JSONArray mediaArray = object.getJSONArray("data");
@@ -152,26 +150,21 @@ class InstagramManager {
                     }
 
                     if (imgArray!=null){
-//                      images>>standard_resolution>>url
                         for (int i=0;i<imgArray.length();i++) {
                             JSONObject jObj = imgArray.getJSONObject(i);
                             JSONObject objImage = (JSONObject) jObj.get("images");
-                            JSONObject objStdImage = (JSONObject) objImage.get("standard_resolution");
+                            JSONObject objStdImage = (JSONObject) objImage.get("thumbnail");
                             String img_url = objStdImage.getString("url");
                             imageArray.add(img_url);
 
                         }
-
                     }
                     System.out.println(imageArray);
                     instream.close();
                 }
-
-
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
-
             return imageArray;
         }
 

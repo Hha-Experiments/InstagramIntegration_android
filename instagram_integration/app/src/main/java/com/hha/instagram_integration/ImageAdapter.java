@@ -5,45 +5,30 @@
 package com.hha.instagram_integration;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
-
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 
 public class ImageAdapter extends BaseAdapter
 {
     private Context context;
     ArrayList<String> urls = null;
+    int layoutResourceId;
+    ImageHolder holder = null;
+    private LayoutInflater layoutInflater;
 
-    public ImageAdapter(Context context,  ArrayList<String> urls) {
+    public ImageAdapter(Context context,   int layoutResourceId, ArrayList<String> urls) {
         this.context = context;
+        this.layoutResourceId = layoutResourceId;
         this.urls = urls;
-    }
 
-    private void displayImage(String url, ImageView imgImageView) {
-        if (url.length() > 0) {
-            Drawable drawable = LoadImageFromWebOperations(url);
-            imgImageView.setImageDrawable(drawable);
-        }
-    }
+        layoutInflater = LayoutInflater.from(context);
 
-    private Drawable LoadImageFromWebOperations(String url)
-    {
-        try
-        {
-            InputStream is = (InputStream) new URL(url).getContent();
-            Drawable d = Drawable.createFromStream(is, "src name");
-            return d;
-        }catch (Exception e) {
-            System.out.println("Exc="+e);
-            return null;
-        }
     }
 
     @Override
@@ -52,29 +37,49 @@ public class ImageAdapter extends BaseAdapter
     }
 
     @Override
-    public Object getItem(int i) {
-        return urls.get(i);
+    public Object getItem(int position) {
+        return urls.get(position);
     }
 
     @Override
-    public long getItemId(int i) {
-        return i;
+    public long getItemId(int position) {
+        return position;
     }
 
-    //---returns an ImageView view---
     public View getView(int position, View convertView, ViewGroup parent)
     {
-        ImageView imageView;
-        if (convertView == null) {
-            imageView = new ImageView(context);
-            imageView.setLayoutParams(new GridView.LayoutParams(185, 185));
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageView.setPadding(5, 5, 5, 5);
-        } else {
-            imageView = (ImageView) convertView;
-        }
-        displayImage(urls.get(position), imageView);
-        return imageView;
-    }
-}
+        View cell_container = convertView;
+        ImageHolder holder;
 
+        if (cell_container == null){
+
+            cell_container = layoutInflater.inflate(layoutResourceId,  parent, false);
+
+            holder = new ImageHolder();
+
+            holder.image = (ImageView) cell_container.findViewById(R.id.img_photo);
+
+            cell_container.setTag(holder);
+        }
+        else{
+            holder = (ImageHolder)cell_container.getTag();
+        }
+
+        Resources res = context.getResources();
+        Drawable drawable = res.getDrawable( R.drawable.loading );
+        holder.image .setImageDrawable( drawable );
+
+        if (holder.image != null) {
+
+            ImageDownloaderTask imgDownloader = new ImageDownloaderTask(holder.image);
+            imgDownloader.execute(urls.get(position));
+        }
+
+        return cell_container;
+    }
+
+    static class ImageHolder {
+        ImageView image;
+    }
+
+}

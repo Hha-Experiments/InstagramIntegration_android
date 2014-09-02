@@ -35,7 +35,7 @@ public class Photo extends Activity {
         logoutButton = (Button) findViewById(R.id.btnLogout);
 
         gridView = (GridView)findViewById(R.id.gridview);
-        context = getBaseContext();
+        context = this;
 
         getPhotosList();
     }
@@ -67,7 +67,7 @@ public class Photo extends Activity {
 
     public static void showImage(ArrayList<String> arrImage){
         System.out.println(arrImage);
-        ImageAdapter adapter = new ImageAdapter(context,arrImage);
+        ImageAdapter adapter = new ImageAdapter(context,R.layout.photo_cell,arrImage);
         gridView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }
