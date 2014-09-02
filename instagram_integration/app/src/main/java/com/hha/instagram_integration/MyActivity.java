@@ -18,17 +18,14 @@ public class MyActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_my);
 
-        //pref name to set the catche value
-        settings = getSharedPreferences( getResources().getString(R.string.pref_name), 0);
+        settings = getSharedPreferences(Constants.PREF_NAME, 0);
         editor = settings.edit();
         InstagramManager manager = InstagramManager.getInstance();
-        //to set the token value for instragram login
-        //editor.putString("login_token", "");
-        //editor.commit();
 
         String token = settings.getString("access_token", "");
         if (token.trim().length()>0) //already login

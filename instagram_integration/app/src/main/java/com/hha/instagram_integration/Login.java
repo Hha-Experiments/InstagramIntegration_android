@@ -3,13 +3,11 @@ package com.hha.instagram_integration;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import com.hha.instagram_integration.R;
 
 public class Login extends Activity {
 
@@ -36,7 +34,7 @@ public class Login extends Activity {
                 if (urlString.contains("#access_token=")) {
                     String[] arrURL = urlString.split("#");
 
-                    settings = getSharedPreferences(getResources().getString(R.string.pref_name), 0);
+                    settings = getSharedPreferences(Constants.PREF_NAME, 0);
                     editor = settings.edit();
 
                     //to set the token value
@@ -80,5 +78,12 @@ public class Login extends Activity {
         Intent intent = new Intent(Login.this, Photo.class);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    public void onBackPressed () {
+
+        Login.super.onBackPressed();
+        Login.this.finish();
     }
 }

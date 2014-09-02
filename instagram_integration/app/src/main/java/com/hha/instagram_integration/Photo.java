@@ -1,37 +1,47 @@
 package com.hha.instagram_integration;
 
 import android.app.Activity;
-import android.os.AsyncTask;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import com.hha.instagram_integration.R;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import android.view.View;
+import android.widget.Button;
+import android.widget.GridView;
+import java.util.ArrayList;
 
 public class Photo extends Activity {
 
+    InstagramManager manager = InstagramManager.getInstance();
+
+    private static GridView gridView;
+    private static Context context;
+
+    private Button logoutButton;
+    SharedPreferences settings;
+    SharedPreferences.Editor editor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo);
+
+        settings = getSharedPreferences(Constants.PREF_NAME, 0);
+        editor = settings.edit();
+
+        logoutButton = (Button) findViewById(R.id.btnLogout);
+
+        gridView = (GridView)findViewById(R.id.gridview);
+        context = getBaseContext();
+
         getPhotosList();
     }
 
     private void getPhotosList(){
-        InstagramManager manager = InstagramManager.getInstance();
+
         manager.getInstagramImages();
 
     }
@@ -55,75 +65,30 @@ public class Photo extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    public static void showImage(ArrayList<String> arrImage){
+        System.out.println(arrImage);
+        ImageAdapter adapter = new ImageAdapter(context,arrImage);
+        gridView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+    }
 
-    public class Download_Image extends AsyncTask<String, Void, String> {
-        protected String doInBackground(String... params) {
+    @Override
+    public void onBackPressed () {
 
-            HttpClient httpclient = new DefaultHttpClient();
+    }
 
-            try {
-                String url = urlStringForRecentMediaRequest().toString();
-                HttpGet httpget = new HttpGet(url);
-                HttpResponse response;
-                JSONArray imageArray = new JSONArray();
+    public void logoutButtonAction(View v) {
 
-                response = httpclient.execute(httpget);
-                HttpEntity entity = response.getEntity();
-                if (entity != null) {
-                    InputStream instream = entity.getContent();
-                    String result = convertStreamToString(instream);// method to convert stream to String
-                    JSONObject object = new JSONObject(new JSONTokener(result));
+        manager.deleteInstagramCookies();
+        editor.remove("access_token");
+        editor.commit();
 
-                    JSONArray mediaArray = object.getJSONArray("data");
-                    for (int i=0;i<mediaArray.length();i++) {
-                        JSONObject jObj = mediaArray.getJSONObject(i);
-                        if (jObj.get("type").equals("image")){
-                            imageArray.put(jObj);
-                        }
-                    }
-                    System.out.println(imageArray);
-                    instream.close();
-                }
+        show_main_view();
+    }
 
-
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-            return "";
-//            return imageArray;
-        }
-        private String convertStreamToString(InputStream is) {
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            StringBuilder sb = new StringBuilder();
-
-            String line = null;
-            try {
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line + "\n");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            return sb.toString();
-        }
-        @Override
-        protected void onPostExecute(String result) {
-
-        }
-
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-        }
+    private void show_main_view(){
+        Intent intent = new Intent(Photo.this, MyActivity.class);
+        startActivity(intent);
+        finish();
     }
 }
