@@ -60,7 +60,6 @@ public class MyActivity extends Activity {
     private void show_login_view(){
         Intent intent = new Intent(MyActivity.this, Login.class);
         startActivity(intent);
-        finish();
     }
 
     private void show_photo_view(){
